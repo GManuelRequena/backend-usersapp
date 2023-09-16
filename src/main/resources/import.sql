@@ -1,0 +1,9 @@
+INSERT INTO users (username, password, email) VALUES ('Manuel', 'Manuel123', 'manuel@gmail.com');
+INSERT INTO users (username, password, email) VALUES ('Floriana', 'Floriana123', 'floariana@gmail.com');
+INSERT INTO users (username, password, email) VALUES ('Santiago', 'Santiago123', 'santiago@gmail.com');
+INSERT INTO users (username, password, email) VALUES ('IronMan', 'IronMan123', 'ironMan@gmail.com');
+INSERT INTO users (username, password, email) VALUES ('Batman', 'Batman123', 'batman@gmail.com');
+INSERT INTO users (username, password, email) VALUES ('DrStrange', 'DrStrange123', 'DrStrange@gmail.com');
+INSERT INTO users (username, password, email) VALUES ('WandaM', 'WandaM123', 'WandaMaximoff@gmail.com');
+INSERT INTO users (username, password, email) VALUES ('Spider-Man', 'SpiderMan123', 'SpiderMan@gmail.com');
+INSERT INTO users (username, password, email) VALUES ('MilesMorales', 'MilesMorales123', 'MilesMorales@gmail.com');
