@@ -1,10 +1,10 @@
 package com.manuel.backend.usersapp.backendusersapp.services;
 
+import com.manuel.backend.usersapp.backendusersapp.models.DTO.UserDTO;
 import com.manuel.backend.usersapp.backendusersapp.models.entities.User;
 import com.manuel.backend.usersapp.backendusersapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +14,12 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService{
 
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+    public BCryptPasswordEncoder getPasswordEncoder(){
+        return this.passwordEncoder;
+    }
     @Autowired
     private UserRepository userRepository;
 
@@ -36,6 +42,14 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public User save(User user) {
+
+        String encryptedPassword = this.getPasswordEncoder().encode(user.getPassword());
+        user.setPassword(encryptedPassword);
+        return getUserRepository().save(user);
+    }
+
+    @Transactional
+    public User saveNoEncode(User user) {
         return getUserRepository().save(user);
     }
 
@@ -46,15 +60,14 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Optional<User> update(User user, Long id) {
+    public Optional<User> update(UserDTO user, Long id) {
         Optional<User> userDB = this.findById(id);
         if (userDB.isPresent()) {
             User existingUser = userDB.orElseThrow();
             existingUser.setUserName(user.getUserName() != null ? user.getUserName() : existingUser.getUserName());
             existingUser.setEmail(user.getEmail() != null ? user.getEmail() : existingUser.getEmail());
-            existingUser.setPassword(user.getPassword() != null ? user.getPassword() : existingUser.getPassword());
 
-            return Optional.ofNullable(this.save(existingUser));
+            return Optional.ofNullable(this.saveNoEncode(existingUser));
         }
         return Optional.empty();
     }

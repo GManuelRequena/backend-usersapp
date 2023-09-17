@@ -1,10 +1,13 @@
 package com.manuel.backend.usersapp.backendusersapp.controllers;
 
+import com.manuel.backend.usersapp.backendusersapp.models.DTO.UserDTO;
 import com.manuel.backend.usersapp.backendusersapp.models.entities.User;
 import com.manuel.backend.usersapp.backendusersapp.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -47,8 +52,11 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult result) {
         try {
+            if(result.hasErrors()){
+                return validation(result);
+            }
             User userCreated = this.getUserService().save(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(userCreated);
         } catch (Exception e) {
@@ -57,8 +65,11 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable Long id) {
-        Optional<User> userDB = this.getUserService().update(user, id);
+    public ResponseEntity<?> updateUser(@Valid @RequestBody UserDTO userDTO, BindingResult result, @PathVariable Long id) {
+        if(result.hasErrors()){
+            return validation(result);
+        }
+        Optional<User> userDB = this.getUserService().update(userDTO, id);
         if (userDB.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " not found.");
         } else {
@@ -75,5 +86,13 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " was not found.");
         }
+    }
+
+    private ResponseEntity<?> validation(BindingResult result) {
+        Map<String, String > errors = new HashMap<>();
+        result.getFieldErrors().forEach(err -> {
+            errors.put(err.getField(), "The field " + err.getField() + " " + err.getDefaultMessage());
+        });
+        return ResponseEntity.badRequest().body(errors);
     }
 }
