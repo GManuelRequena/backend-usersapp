@@ -53,15 +53,15 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult result) {
-        try {
+        //try {
             if(result.hasErrors()){
                 return validation(result);
             }
-            User userCreated = this.getUserService().save(user);
+            UserDTO userCreated = this.getUserService().save(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(userCreated);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        //} catch (Exception e) {
+        //    return ResponseEntity.badRequest().body(e.getMessage());
+        //}
     }
 
     @PutMapping("/{id}")

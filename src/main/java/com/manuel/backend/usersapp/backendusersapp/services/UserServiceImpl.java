@@ -5,6 +5,7 @@ import com.manuel.backend.usersapp.backendusersapp.models.entities.User;
 import com.manuel.backend.usersapp.backendusersapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,11 +42,14 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public User save(User user) {
+    public UserDTO save(User user) {
 
         String encryptedPassword = this.getPasswordEncoder().encode(user.getPassword());
         user.setPassword(encryptedPassword);
-        return getUserRepository().save(user);
+        User userCreated = this.getUserRepository().save(user);
+        UserDTO returnUser = new UserDTO(userCreated.getUsername(), userCreated.getEmail());
+
+        return returnUser;
     }
 
     @Transactional
@@ -64,7 +68,7 @@ public class UserServiceImpl implements UserService{
         Optional<User> userDB = this.findById(id);
         if (userDB.isPresent()) {
             User existingUser = userDB.orElseThrow();
-            existingUser.setUserName(user.getUserName() != null ? user.getUserName() : existingUser.getUserName());
+            existingUser.setUsername(user.getUsername() != null ? user.getUsername() : existingUser.getUsername());
             existingUser.setEmail(user.getEmail() != null ? user.getEmail() : existingUser.getEmail());
 
             return Optional.ofNullable(this.saveNoEncode(existingUser));

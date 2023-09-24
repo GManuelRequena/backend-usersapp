@@ -10,7 +10,7 @@ public interface UserService {
 
     List<User> findAll();
     Optional<User> findById(Long id);
-    User save(User user);
+    UserDTO save(User user);
     Optional<User> update(UserDTO user, Long id);
     void remove(Long id);
 }

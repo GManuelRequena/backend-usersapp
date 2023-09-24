@@ -6,10 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -21,7 +19,7 @@ public class User {
     private Long id;
     @NotBlank(message = "can not be empty or blank.")
     @Column(name = "username", unique = true)
-    private String userName;
+    private String username;
     @NotBlank(message = "can not be empty or blank.")
     @Size(min = 6, message = "must have minimum of 6 characters.")
     private String password;
@@ -33,9 +31,9 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String userName, String password, String email) {
+    public User(Long id, String username, String password, String email) {
         this.id = id;
-        this.userName = userName;
+        this.username = username;
         this.password = password;
         this.email = email;
     }
@@ -48,12 +46,12 @@ public class User {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -76,7 +74,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", userName='" + userName + '\'' +
+                ", userName='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
                 '}';
