@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.manuel.backend.usersapp.backendusersapp.enums.SecurityEnums.*;
 
+import com.manuel.backend.usersapp.backendusersapp.auth.SimpleGrantedAuthorityJsonCreator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -20,10 +21,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class JwtValidationFilter extends BasicAuthenticationFilter {
@@ -44,10 +44,15 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
         try {
             //Here I validate that the token was signed with the same key that was created
             Claims claims = Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token).getBody();
+
+            Object authoritiesClaims = claims.get("Authorities");
+
             String username = claims.getSubject();
 
-            List<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority(ROLE_USER));
+            Collection<? extends GrantedAuthority> authorities = Arrays.asList(
+                    new ObjectMapper()
+                            .addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityJsonCreator.class)
+                            .readValue(authoritiesClaims.toString().getBytes(), SimpleGrantedAuthority[].class));
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
 

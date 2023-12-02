@@ -37,13 +37,13 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllUsers() {
-        List<User> users = this.getUserService().findAll();
+        List<UserDTO> users = this.getUserService().findAll();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        Optional<User> user = getUserService().findById(id);
+        Optional<UserDTO> user = getUserService().findById(id);
         if (user.isPresent()) {
             return ResponseEntity.ok(user.orElseThrow());
         }
@@ -53,15 +53,15 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult result) {
-        //try {
+        try {
             if(result.hasErrors()){
                 return validation(result);
             }
             UserDTO userCreated = this.getUserService().save(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(userCreated);
-        //} catch (Exception e) {
-        //    return ResponseEntity.badRequest().body(e.getMessage());
-        //}
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
@@ -69,7 +69,7 @@ public class UserController {
         if(result.hasErrors()){
             return validation(result);
         }
-        Optional<User> userDB = this.getUserService().update(userDTO, id);
+        Optional<UserDTO> userDB = this.getUserService().update(userDTO, id);
         if (userDB.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " not found.");
         } else {
@@ -79,7 +79,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        Optional<User> user = this.getUserService().findById(id);
+        Optional<UserDTO> user = this.getUserService().findById(id);
         if (user.isPresent()) {
             this.getUserService().remove(id);
             return ResponseEntity.ok("User was removed.");

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manuel.backend.usersapp.backendusersapp.enums.SecurityEnums;
 import com.manuel.backend.usersapp.backendusersapp.models.entities.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,10 +17,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.Base64;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,7 +64,16 @@ public class JwtAuthenticationFilters extends UsernamePasswordAuthenticationFilt
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         String username = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal()).getUsername();
 
+        Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
+
+        Claims claims = Jwts.claims();
+        boolean isAdmin = roles.stream().anyMatch(r -> r.getAuthority().equals(SecurityEnums.ROLE_ADMIN));
+        claims.put("Authorities", new ObjectMapper().writeValueAsString(roles));
+        claims.put("isAdmin", isAdmin);
+        claims.put("username", username);
+
         String token = Jwts.builder()
+                .setClaims(claims)
                 .setSubject(username)
                 .signWith(SecurityEnums.SECRET_KEY)
                 .setIssuedAt(new Date())

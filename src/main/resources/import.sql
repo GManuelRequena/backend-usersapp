@@ -18,3 +18,18 @@ INSERT INTO users (id,email,password,username) VALUES (7,'WandaM@email.com','$2a
 INSERT INTO users (id,email,password,username) VALUES (8,'Spider-Man@email.com','$2a$10$/ab7617U2mhDtbr9/jqW4eKzpIM7cohM1J4BjUUmtOakhC6k97ATS','Spider-Man');
 INSERT INTO users (id,email,password,username) VALUES (9,'MilesMorales@email.com','$2a$10$9APlU9YZlC7NFZAnBcvoIuj5cC0hC/FbSDfNFqniMUbdiA6tSJCiG','MilesMorales');
 INSERT INTO users (id,email,password,username) VALUES (10,'Wolverine@email.com','$2a$10$9APlU9YZlC7NFZAnBcvoIuj5cC0hC/FbSDfNFqniMUbdiA6tSJCiG','JamesHowlett');
+
+INSERT INTO roles (id, name) VALUES (1, 'ROLE_ADMIN');
+INSERT INTO roles (id, name) VALUES (2, 'ROLE_USER');
+
+INSERT INTO users_roles (user_id, role_id) VALUES (1, 1);
+INSERT INTO users_roles (user_id, role_id) VALUES (1, 2);
+INSERT INTO users_roles (user_id, role_id) VALUES (2, 2);
+INSERT INTO users_roles (user_id, role_id) VALUES (3, 2);
+INSERT INTO users_roles (user_id, role_id) VALUES (4, 2);
+INSERT INTO users_roles (user_id, role_id) VALUES (5, 2);
+INSERT INTO users_roles (user_id, role_id) VALUES (6, 2);
+INSERT INTO users_roles (user_id, role_id) VALUES (7, 2);
+INSERT INTO users_roles (user_id, role_id) VALUES (8, 2);
+INSERT INTO users_roles (user_id, role_id) VALUES (9, 2);
+INSERT INTO users_roles (user_id, role_id) VALUES (10, 2);

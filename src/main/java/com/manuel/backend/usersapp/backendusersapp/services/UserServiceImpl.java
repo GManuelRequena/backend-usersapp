@@ -1,16 +1,23 @@
 package com.manuel.backend.usersapp.backendusersapp.services;
 
 import com.manuel.backend.usersapp.backendusersapp.models.DTO.UserDTO;
+import com.manuel.backend.usersapp.backendusersapp.models.entities.Role;
 import com.manuel.backend.usersapp.backendusersapp.models.entities.User;
+import com.manuel.backend.usersapp.backendusersapp.models.mapper.UserDTOMapper;
+import com.manuel.backend.usersapp.backendusersapp.repositories.RoleRepository;
 import com.manuel.backend.usersapp.backendusersapp.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.manuel.backend.usersapp.backendusersapp.enums.SecurityEnums.ROLE_USER;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -28,16 +35,30 @@ public class UserServiceImpl implements UserService{
         return this.userRepository;
     }
 
+    @Autowired
+    private RoleRepository roleRepository;
+
+    public RoleRepository getRoleRepository(){
+        return this.roleRepository;
+    }
+
+
     @Override
     @Transactional(readOnly = true)
-    public List<User> findAll() {
-        return (List<User>) getUserRepository().findAll();
+    public List<UserDTO> findAll() {
+        List<User> users = (List<User>) this.getUserRepository().findAll();
+
+        return users.stream()
+                .map(u -> UserDTOMapper.builder().setUser(u).build())
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> findById(Long id) {
-        return getUserRepository().findById(id);
+    public Optional<UserDTO> findById(Long id) {
+        return this.getUserRepository()
+                .findById(id)
+                .map(u -> UserDTOMapper.builder().setUser(u).build());
     }
 
     @Override
@@ -46,10 +67,16 @@ public class UserServiceImpl implements UserService{
 
         String encryptedPassword = this.getPasswordEncoder().encode(user.getPassword());
         user.setPassword(encryptedPassword);
-        User userCreated = this.getUserRepository().save(user);
-        UserDTO returnUser = new UserDTO(userCreated.getUsername(), userCreated.getEmail());
 
-        return returnUser;
+        List<Role> roles = new ArrayList<>();
+        Optional<Role> role = this.getRoleRepository().getRoleByName(ROLE_USER);
+        if(role.isPresent()){
+            roles.add(role.orElseThrow());
+        }
+        user.setRoles(roles);
+        //User userCreated = this.getUserRepository().save(user);
+        // new UserDTO(userCreated.getUsername(), userCreated.getEmail());
+        return  UserDTOMapper.builder().setUser(this.getUserRepository().save(user)).build();
     }
 
     @Transactional
@@ -64,15 +91,15 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Optional<User> update(UserDTO user, Long id) {
-        Optional<User> userDB = this.findById(id);
+    public Optional<UserDTO> update(UserDTO user, Long id) {
+        Optional<User> userDB = this.getUserRepository().findById(id);
+        User existingUser = null;
         if (userDB.isPresent()) {
-            User existingUser = userDB.orElseThrow();
+            existingUser = userDB.orElseThrow();
             existingUser.setUsername(user.getUsername() != null ? user.getUsername() : existingUser.getUsername());
             existingUser.setEmail(user.getEmail() != null ? user.getEmail() : existingUser.getEmail());
-
-            return Optional.ofNullable(this.saveNoEncode(existingUser));
+            this.getUserRepository().save(existingUser);
         }
-        return Optional.empty();
+        return Optional.ofNullable(UserDTOMapper.builder().setUser(existingUser).build());
     }
 }
