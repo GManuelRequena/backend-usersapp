@@ -5,6 +5,8 @@ import com.manuel.backend.usersapp.backendusersapp.models.entities.User;
 import com.manuel.backend.usersapp.backendusersapp.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -24,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+//@RequestMapping("/api/v1/users")
 @RequestMapping("/api/v1/users")
 @CrossOrigin(originPatterns = "*")
 public class UserController {
@@ -87,6 +90,13 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with id " + id + " was not found.");
         }
     }
+
+    @GetMapping("/page/{page}")
+    public ResponseEntity<?> getUsersPage(@PathVariable Integer page) {
+        Pageable pageable = PageRequest.of(page, 3);
+        return ResponseEntity.ok(this.getUserService().findAll(pageable));
+    }
+
 
     private ResponseEntity<?> validation(BindingResult result) {
         Map<String, String > errors = new HashMap<>();

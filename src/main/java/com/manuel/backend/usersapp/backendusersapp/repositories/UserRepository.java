@@ -1,6 +1,8 @@
 package com.manuel.backend.usersapp.backendusersapp.repositories;
 
 import com.manuel.backend.usersapp.backendusersapp.models.entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -14,4 +16,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> getUserByUsername(String username);
 
     Optional<User> findById(Long id);
+
+    Page<User> findAll(Pageable pageable);
 }

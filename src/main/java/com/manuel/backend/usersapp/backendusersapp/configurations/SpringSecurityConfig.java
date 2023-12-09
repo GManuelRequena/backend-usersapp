@@ -58,7 +58,7 @@ public class SpringSecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests()
-                .requestMatchers(HttpMethod.GET, "/api/v1/users/all").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users", "/api/v1/users/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/users/{id}").hasAnyRole(USER, ADMIN)
                 .requestMatchers(HttpMethod.POST, "/api/v1/users").hasRole(ADMIN)
                 .requestMatchers("/api/v1/users/**").hasRole(ADMIN)
